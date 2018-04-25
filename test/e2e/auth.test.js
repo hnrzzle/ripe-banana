@@ -46,7 +46,32 @@ describe.only('Auth api', () => {
             });
     });
 
+    it('throws 400 on same email signup', () => {
+        return request
+            .post('/auth/signup')
+            .send({
+                name: 'fakejoe',
+                company: 'joe2.com',
+                email: 'joe@joe.com',
+                password: 'abc'
+            })
+            .then(res => {
+                assert.equal(res.status, 400);
+                assert.equal(res.body.error, 'Email already exists');
+            });
+    });
 
+    it('throws 401 on not signed up email', () => {
+        return request
+            .post('/auth/signin')
+            .send({
+                email: 'joe@joe.com',
+                password: 'hackingin'
+            })
+            .then(res => {
+                assert.equal(res.status, 401);
+                assert.equal(res.body.error, 'Invalid email or password');
+            });
+    });
 
-
-})
+});
