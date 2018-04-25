@@ -25,6 +25,27 @@ describe.only('Auth api', () => {
         assert.ok(token);
     });
 
+    it('verifies', () => {
+        return request
+            .get('/auth/verify')
+            .set('Authorization', token)
+            .then(({ body }) => {
+                assert.ok(body.verified);
+            });
+    });
+
+    it('signin', () => {
+        return request
+            .post('/auth/signin')
+            .send({
+                email: 'joe@joe.com',
+                password: 'abc'
+            })
+            .then(({ body }) => {
+                assert.ok(body.token);
+            });
+    });
+
 
 
 
