@@ -15,7 +15,7 @@
     "test:unit": "mocha test/unit",
     "test:e2e": "mocha test/e2e",
     "test:watch": "nodemon --exec npm run test:mocha",
-    "test:e2e:watch": "nodemon --exec 'npm run test:e2e'",
+    "test:e2e:watch": "nodemon --exec npm run test:e2e",
     "test:unit:watch": "nodemon --exec npm run test:unit"
   },
   "repository": {
@@ -39,6 +39,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.1",
     "mongoose": "^5.0.15",
     "morgan": "^1.9.0",
     "npm": "^5.8.0"
