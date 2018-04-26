@@ -4,13 +4,13 @@ const createEnsureAuth = require('../../lib/util/ensure-auth');
 
 describe('ensure auth middleware', ()  => {
 
-    const user = { _id: 123 };
+    const reviewer = { _id: 123 };
     let token = '';
-    beforeEach(() => token = tokenService.sign(user));
+    beforeEach(() => token = tokenService.sign(reviewer));
 
     const ensureAuth = createEnsureAuth();
 
-    it('adds payload as req.user on success', done => {
+    it('adds payload as req.reviewer on success', done => {
         const req = {
             get(header) {
                 if(header === 'Authorization') return token;
@@ -18,7 +18,7 @@ describe('ensure auth middleware', ()  => {
         };
 
         const next = () => {
-            assert.equal(req.user.id, user._id);
+            assert.equal(req.reviewer.id, reviewer._id);
             done();
         };
 
