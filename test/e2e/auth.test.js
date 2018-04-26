@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
 
-describe.only('Auth api', () => {
+describe('Auth api', () => {
 
     beforeEach(() => dropCollection('reviewers'));
 

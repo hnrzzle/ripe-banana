@@ -1,17 +1,20 @@
 const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
+const { verify } = require('../../lib/util/token-service');
 
-describe('Films API', () => {
+describe.only('Films API', () => {
     
     before(() => dropCollection('studios'));
     before(() => dropCollection('actors'));
     before(() => dropCollection('films'));
+    before(() => dropCollection('reviewers'));
 
     const checkOk = res => {
         if(!res.ok) throw res.error;
         return res;
     };
+
 
     let studio1 = {
         name: 'Miramax',
@@ -60,10 +63,12 @@ describe('Films API', () => {
     });
 
     before(() => {
-        return request.post('/reviewers')
+        return request.post('/auth/signup')
             .send(reviewer1)
             .then(({ body }) => {
-                reviewer1 = body;
+                const id = verify(body.token).id;
+                reviewer1._id = id;
+
             });
     });
 
@@ -89,7 +94,9 @@ describe('Films API', () => {
 
     let reviewer1 = {
         name: 'IGN',
-        company: 'IGN'
+        company: 'IGN',
+        email: 'ign@ign.com',
+        password: '123'
     };
 
     let review1 = {
