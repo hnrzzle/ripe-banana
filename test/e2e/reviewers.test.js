@@ -127,7 +127,6 @@ describe('Reviewer e2e', () => {
             .then(({ body }) => {
                 delete donald.password;
                 delete donald.email;
-                console.log(body);
                 const { _id } = body;
                 assert.ok(_id);
                 assert.deepEqual(body, { _id, reviews: [], ...donald }),

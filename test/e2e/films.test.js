@@ -3,7 +3,7 @@ const request = require('./request');
 const { dropCollection } = require('./db');
 const { verify } = require('../../lib/util/token-service');
 
-describe('Films API', () => {
+describe.only('Films API', () => {
     
     before(() => dropCollection('studios'));
     before(() => dropCollection('actors'));
@@ -99,7 +99,8 @@ describe('Films API', () => {
         name: 'IGN',
         company: 'IGN',
         email: 'ign@ign.com',
-        password: '123'
+        password: '123',
+        roles: ['Admin']
     };
 
     let review1 = {
@@ -211,6 +212,7 @@ describe('Films API', () => {
     
     it('deletes a film', () => {
         return request.delete(`/films/${film2._id}`)
+            .set('Authorization', token)
             .then(() => {
                 return request.get(`/films/${film2._id}`); 
             })
