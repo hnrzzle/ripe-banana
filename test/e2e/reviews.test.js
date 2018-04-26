@@ -12,6 +12,8 @@ describe('Review e2e', () => {
     before(() => dropCollection('actors'));
     before(() => dropCollection('films'));
 
+    let token = '';
+
     const checkOk = res => {
         if(!res.ok) throw res.error;
         return res;
@@ -81,6 +83,7 @@ describe('Review e2e', () => {
         return request.post('/auth/signup')
             .send(donald)
             .then(({ body }) => {
+                token = body.token;
                 donald._id = verify(body.token).id;
 
             });
@@ -99,6 +102,7 @@ describe('Review e2e', () => {
         review1.film = film1._id;
 
         return request.post('/reviews')
+            .set('Authorization', token)
             .send(review1)
             .then(({ body }) => {
                 const { _id, __v, film, createdAt, updatedAt } = body;
