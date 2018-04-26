@@ -8,7 +8,7 @@ const checkOk = res => {
     return res;
 };
 
-describe.only('actors API', () => {
+describe('actors API', () => {
 
     before(() => dropCollection('reviewers'));
     before(() => dropCollection('actors'));
