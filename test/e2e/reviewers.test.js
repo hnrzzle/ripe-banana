@@ -123,21 +123,21 @@ describe.only('Reviewer e2e', () => {
             })
             .then(({ body }) => {
                 delete donald.password;
-                const { _id, __v, hash, roles } = body;
+                delete donald.email;
+                console.log(body);
+                const { _id } = body;
                 assert.ok(_id);
-                assert.equal(__v, 0);
-                assert.deepEqual(body, { _id, __v, hash, roles, reviews: [], ...donald }),
+                assert.deepEqual(body, { _id, reviews: [], ...donald }),
                 donald = body;
             
             });
     });
 
-    it('gets reviewer by id snd returns reviews', () => {
+    it('gets reviewer by id and returns reviews', () => {
         return request.get(`/reviewers/${jeff._id}`)
             .then(({ body }) => {
                 assert.deepEqual(body, {
                     _id: jeff._id,
-                    __v: 0,
                     name: jeff.name,
                     company: jeff.company,
                     reviews: [{
