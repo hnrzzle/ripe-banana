@@ -1,10 +1,9 @@
 const { assert } = require('chai');
 const request = require('./request');
-const Reviewer = require('../../lib/models/Reviewer');
 const { dropCollection } = require('./db');
 const { verify } = require('../../lib/util/token-service');
 
-describe.only('Reviewer e2e', () => {
+describe('Reviewer e2e', () => {
 
     before(() => dropCollection('reviewers'));
     before(() => dropCollection('studios'));
