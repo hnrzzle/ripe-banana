@@ -3,7 +3,7 @@ const request = require('./request');
 const { dropCollection } = require('./db');
 const { verify } = require('../../lib/util/token-service');
 
-describe.only('Films API', () => {
+describe('Films API', () => {
     
     before(() => dropCollection('studios'));
     before(() => dropCollection('actors'));
@@ -70,8 +70,6 @@ describe.only('Films API', () => {
                 token = body.token;
                 const id = verify(body.token).id;
                 reviewer1._id = id;
-
-
             });
     });
 
