@@ -1,6 +1,7 @@
 const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
+const { verify } = require('../../lib/util/token-service');
 
 const checkOk = res => {
     if(!res.ok) throw res.error;
@@ -9,9 +10,12 @@ const checkOk = res => {
 
 describe('actors API', () => {
 
+    before(() => dropCollection('reviewers'));
     before(() => dropCollection('actors'));
     before(() => dropCollection('studios'));
     before(() => dropCollection('films'));
+
+    let token = '';
 
     let bradPitt = {
         name: 'Brad Pitt',
@@ -42,7 +46,25 @@ describe('actors API', () => {
             part: 'Cool guy',
             actor: {}
         }]
-    }; 
+    };
+
+    let reviewer1 = {
+        name: 'IGN',
+        company: 'IGN',
+        email: 'ign@ign.com',
+        password: '123',
+        roles: ['Admin']
+    };
+
+    before(() => {
+        return request.post('/auth/signup')
+            .send(reviewer1)
+            .then(({ body }) => {
+                token = body.token;
+                const id = verify(body.token).id;
+                reviewer1._id = id;
+            });
+    });
 
     before(() => {
         return request.post('/studios')
@@ -89,6 +111,7 @@ describe('actors API', () => {
         bradPitt.pob = 'Shawnee, OK';
 
         return request.put(`/actors/${bradPitt._id}`)
+            .set('Authorization', token)
             .send(bradPitt)
             .then(checkOk)
             .then(({ body }) => {
@@ -124,6 +147,7 @@ describe('actors API', () => {
 
     it('returns message on delete of actor in film', () => {
         return request.delete(`/actors/${bradPitt._id}`)
+            .set('Authorization', token)
             .then(({ body }) => {
                 assert.deepEqual(body, { removed: false });
             });
@@ -131,6 +155,7 @@ describe('actors API', () => {
 
     it('returns true on delete of actor not in film', () => {
         return request.delete(`/actors/${milaKunis._id}`)
+            .set('Authorization', token)
             .then(() => {
                 return request.get(`/actors/${milaKunis._id}`); 
             })

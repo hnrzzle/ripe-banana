@@ -1,10 +1,14 @@
 const { assert } = require('chai');
 const request = require('./request');
 const { dropCollection } = require('./db');
+const { verify } = require('../../lib/util/token-service');
 
 describe('Studio API', () => {
 
+    before(() => dropCollection('reviewers'));
     before(() => dropCollection('studios'));
+
+    let token = '';
 
     let studio1 = {
         name: 'Miramax',
@@ -39,6 +43,24 @@ describe('Studio API', () => {
             actor: {}
         }]
     };
+
+    let reviewer1 = {
+        name: 'IGN',
+        company: 'IGN',
+        email: 'ign@ign.com',
+        password: '123',
+        roles: ['Admin']
+    };
+
+    before(() => {
+        return request.post('/auth/signup')
+            .send(reviewer1)
+            .then(({ body }) => {
+                token = body.token;
+                const id = verify(body.token).id;
+                reviewer1._id = id;
+            });
+    });
 
     before(() => {
         return request.post('/actors')
@@ -111,6 +133,7 @@ describe('Studio API', () => {
 
     it('DELETE by id false if films exist in studio', () => {
         return request.delete(`/studios/${studio1._id}`)
+            .set('Authorization', token)
             .then(({ body }) => {
                 assert.deepEqual(body, { removed: false });
             });
@@ -118,6 +141,7 @@ describe('Studio API', () => {
 
     it('returns true on delete of studio if no films', () => {
         return request.delete(`/studios/${studio2._id}`)
+            .set('Authorization', token)
             .then(() => {
                 return request.get(`/studios/${studio2._id}`); 
             })
