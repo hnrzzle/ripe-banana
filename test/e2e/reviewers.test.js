@@ -17,13 +17,11 @@ describe('Reviewer e2e', () => {
 
     let donald = {
         name: 'Angry Donald',
-        company: 'angrydonald.com'
+        company: 'angrydonald.com',
+        email: 'don@don.com',
+        password: '123'
     };
 
-    let rob = {
-        name: 'Angry Robert',
-        company: 'angryrob.com'
-    };
 
     let jeff = {
         name: 'Angry Jeff',
@@ -147,32 +145,6 @@ describe('Reviewer e2e', () => {
 
     });
 
-    it('gets reviewer by id', () => {
-        return Reviewer.create(rob).then(roundTrip)
-            .then(saved => {
-                rob = saved;
-                return request.get(`/reviewers/${rob._id}`);
-            })
-            .then(({ body }) => {
-                assert.deepEqual(body, { 
-                    ...rob, 
-                    reviews: []
-                });
-            });
-    });
-
-    it('updates a reviewer', () => {
-        rob.company = 'angryrobert.com';
-        return request.put(`/reviewers/${rob._id}`)
-            .send(rob)
-            .then(({ body }) => {
-                assert.deepEqual(body, rob);
-                return Reviewer.findById(rob._id).then(roundTrip);
-            })
-            .then(updated => {
-                assert.deepEqual(updated, rob);
-            });
-    });
 
     const getFields = ({ _id, name, company }) => ({ _id, name, company });
 
