@@ -2,8 +2,9 @@ const { assert } = require('chai');
 const request = require('./request');
 const Reviewer = require('../../lib/models/Reviewer');
 const { dropCollection } = require('./db');
+const { verify } = require('../../lib/util/token-service');
 
-describe('Reviewer e2e', () => {
+describe.only('Reviewer e2e', () => {
 
     before(() => dropCollection('reviewers'));
     before(() => dropCollection('studios'));
@@ -25,7 +26,9 @@ describe('Reviewer e2e', () => {
 
     let jeff = {
         name: 'Angry Jeff',
-        company: 'angryjeff.com'
+        company: 'angryjeff.com',
+        email: 'jeff@jeff.com',
+        password: '123'
     };
 
     let studio1 = {
@@ -61,10 +64,10 @@ describe('Reviewer e2e', () => {
     };
 
     before(() => {
-        return request.post('/reviewers')
+        return request.post('/auth/signup')
             .send(jeff)
             .then(({ body }) => {
-                jeff = body;
+                jeff._id = verify(body.token).id;
             });
     });
 
@@ -110,17 +113,24 @@ describe('Reviewer e2e', () => {
     });
 
     it('saves a reviewer', () => {
-        return request.post('/reviewers')
+        return request.post('/auth/signup')
             .send(donald)
             .then(({ body }) => {
-                const { _id, __v } = body;
+                return verify(body.token).id;
+            })
+            .then(id => {
+                return request.get(`/reviewers/${id}`);
+            })
+            .then(({ body }) => {
+                delete donald.password;
+                const { _id, __v, hash, roles } = body;
                 assert.ok(_id);
                 assert.equal(__v, 0);
-                assert.deepEqual(body, { _id, __v, ...donald }),
+                assert.deepEqual(body, { _id, __v, hash, roles, reviews: [], ...donald }),
                 donald = body;
+            
             });
     });
-    const roundTrip = doc => JSON.parse(JSON.stringify(doc.toJSON()));
 
     it('gets reviewer by id snd returns reviews', () => {
         return request.get(`/reviewers/${jeff._id}`)
@@ -151,7 +161,7 @@ describe('Reviewer e2e', () => {
     it('gets all reviewers', () => {
         return request.get('/reviewers')
             .then(({ body }) => {
-                assert.deepEqual(body, [jeff, donald, rob].map(getFields));
+                assert.deepEqual(body, [jeff, donald].map(getFields));
             });
     });
 
