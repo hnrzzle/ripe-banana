@@ -3,7 +3,7 @@ const request = require('./request');
 const { dropCollection } = require('./db');
 const { verify } = require('../../lib/util/token-service');
 
-describe('Films API', () => {
+describe.only('Films API', () => {
     
     before(() => dropCollection('studios'));
     before(() => dropCollection('actors'));
@@ -15,6 +15,7 @@ describe('Films API', () => {
         return res;
     };
 
+    let token = '';
 
     let studio1 = {
         name: 'Miramax',
@@ -66,8 +67,10 @@ describe('Films API', () => {
         return request.post('/auth/signup')
             .send(reviewer1)
             .then(({ body }) => {
+                token = body.token;
                 const id = verify(body.token).id;
                 reviewer1._id = id;
+
 
             });
     });
@@ -111,6 +114,7 @@ describe('Films API', () => {
         film1.studio.name = studio1.name;
         film1.cast[0].actor._id = actor1._id;
         return request.post('/films')
+            .set('Authorization', token)
             .send(film1)
             .then(checkOk)
             .then(({ body }) => {
@@ -158,6 +162,7 @@ describe('Films API', () => {
         review1.film = film1._id;
         review1.reviewer = reviewer1._id;
         return request.post('/reviews')
+            .set('Authorization', token)
             .send(review1)
             .then(({ body }) => {
                 const { _id, __v, film, createdAt, updatedAt } = body;
